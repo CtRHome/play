@@ -32,7 +32,7 @@
       "retry": 2000,
       "timeout": 250,
       "cooldown": 60,
-      "enabled": true,
+      "enabled": false,
       "placement": "breaks",
       "eventIds": [
         "break:gameover",
@@ -42,7 +42,7 @@
     "rewarded": {
       "retry": 2000,
       "timeout": 250,
-      "enabled": false,
+      "enabled": true,
       "preload": 500,
       "eventIds": [
         "button:restoreenergywindow:restoreenergy",
