@@ -1,0 +1,50 @@
+{
+  "name": "Cut the Rope: Magic",
+  "short_name": "Cut the Rope: Magic",
+  "description": "Join Om Nom’s newest adventure and transform him into magical forms to help the lovable little monster recover candy stolen by an evil wizard! ",
+  "start_url": "index.html",
+  "display": "fullscreen",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "id": "cut-the-rope-magic",
+  "launch_handler": {
+    "client_mode": "auto"
+  },
+  "ms_start_compatible": true,
+  "categories": [
+    "games"
+  ],
+  "dir": "auto",
+  "orientation": "any",
+  "screenshots": [
+    {
+      "src": "_assets_/screenshots/1920x1080.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "platform": "wide"
+    },
+    {
+      "src": "_assets_/screenshots/1080x1920.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "platform": "narrow"
+    }
+  ],
+  "icons": [
+    {
+      "src": "_assets_/icons/512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "_assets_/icons/1920x1080.png",
+      "sizes": "1920x1080",
+      "type": "image/png"
+    },
+    {
+      "src": "_assets_/icons/192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}

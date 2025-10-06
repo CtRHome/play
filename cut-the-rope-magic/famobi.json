@@ -1,0 +1,61 @@
+{
+  "gameIdOnPortal": "9P6KSXPVKJT6",
+  "toolGameId": "SmU7lPWEQgrhSJD7PfHs",
+  "gameId": "cut-the-rope-magic",
+  "name": "Cut the Rope: Magic",
+  "version": "1.1.0",
+  "exportedAt": "2025-09-18T16:00:45.138Z",
+  "maxLevels": 0,
+  "features": {
+    "audio": true,
+    "copyright": true,
+    "credits": true,
+    "pause": true,
+    "progress": true,
+    "score": true,
+    "tutorial": true,
+    "version": true,
+    "visibilitychange": true,
+    "iap": false,
+    "home": true,
+    "privacy": true
+  },
+  "ads": {
+    "initial": {
+      "retry": 2000,
+      "timeout": 250,
+      "preload": 250,
+      "enabled": false
+    },
+    "interstitial": {
+      "preload": 250,
+      "retry": 2000,
+      "timeout": 250,
+      "cooldown": 60,
+      "enabled": true,
+      "placement": "breaks",
+      "eventIds": [
+        "break:gameover",
+        "break:result"
+      ]
+    },
+    "rewarded": {
+      "retry": 2000,
+      "timeout": 250,
+      "enabled": true,
+      "preload": 500,
+      "eventIds": [
+        "button:restoreenergywindow:restoreenergy",
+        "button:result:doublegift"
+      ]
+    },
+    "banner": {
+      "retry": 2000,
+      "timeout": 250,
+      "enabled": false,
+      "preload": 250
+    }
+  },
+  "storage": {},
+  "microsoftStart": {}
+}

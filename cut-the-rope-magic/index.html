@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+  <link rel="manifest" href="manifest.json">
+  <script src="./microsoftStart-game-interface.js"></script>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="stylesheet" href="style.css">
+  <title>Cut The Rope</title>
+
+  
+  <script>
+    let buildUrl = "Build";
+    window.GameInterface.init([
+      buildUrl + "/WebGL.loader.js",
+      './game-boot.js'
+    ]);
+  </script>
+</head>
+
+<body>
+  <div id="unity-container">
+    <canvas id="unity-canvas"></canvas>
+  </div>
+  <div id="unity-loading-container">
+    <div id="unity-loading-bar">
+      <div id="unity-loading-bar-inner"></div>
+    </div>
+  </div>
+</body>
+
+</html>
