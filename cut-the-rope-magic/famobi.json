@@ -42,7 +42,7 @@
     "rewarded": {
       "retry": 2000,
       "timeout": 250,
-      "enabled": true,
+      "enabled": false,
       "preload": 500,
       "eventIds": [
         "button:restoreenergywindow:restoreenergy",
