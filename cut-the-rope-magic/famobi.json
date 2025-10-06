@@ -25,7 +25,7 @@
       "retry": 2000,
       "timeout": 250,
       "preload": 250,
-      "enabled": false
+      "enabled": true
     },
     "interstitial": {
       "preload": 250,
