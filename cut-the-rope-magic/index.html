@@ -7,9 +7,7 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <link rel="stylesheet" href="style.css">
-  <link rel="icon" href="/img/favicon/magicfamobi.ico">
-  <title>Cut the Rope Magic</title>
-
+  <title>Cut The Rope</title>
   
   <script>
     let buildUrl = "Build";
@@ -17,6 +15,56 @@
       buildUrl + "/WebGL.loader.js",
       './game-boot.js'
     ]);
+  </script>
+
+  <script>
+    (function ctroverwrite() {
+      const ENERGYTIME = "3025-10-06T18:45:18.3550000-03:00";
+      const ENERGY = 65535;
+      let lastprint = 0;
+
+      function patchsave(printStatus = false) {
+        let raw;
+        try {raw = localStorage.getItem("cut-the-rope-magic:savegame")}
+        catch (e) {if (printStatus) console.warn("couldn't access local storage..", e); return}
+        if (!raw) {if (printStatus) console.log("no savegame found yet.."); return}
+        let obj;
+        try {obj = JSON.parse(raw)} 
+        catch (e) {if (printStatus) console.warn("json parse error..", e); return}
+        if (!obj || typeof obj !== "object" || !obj.saveData) {if (printStatus) console.log("save data missing in savegame object.."); return}
+        let saveData;
+        try {saveData = JSON.parse(obj.saveData)}
+        catch (e) {if (printStatus) console.warn("json parse error..", e); return}
+        if (!saveData || typeof saveData !== "object") {if (printStatus) console.log("save data is not an object."); return}
+
+        let changed = false;
+        let energytimechanged = false;
+        let energychanged = false;
+
+        if (saveData.CutTheRopeMagic_EnergyTime !== ENERGYTIME) {
+          saveData.CutTheRopeMagic_EnergyTime = ENERGYTIME;
+          changed = true; energytimechanged = true;
+        }
+        if (saveData.CutTheRopeMagic_Energy !== ENERGY) {
+          saveData.CutTheRopeMagic_Energy = ENERGY;
+          changed = true; energychanged = true;
+        }
+        if (changed) {
+          try {
+            obj.saveData = JSON.stringify(saveData);
+            localStorage.setItem("cut-the-rope-magic:savegame", JSON.stringify(obj));
+          }
+          catch (e) {if (printStatus) console.warn("couldn't update local storage..", e)}
+        }
+        if (printStatus) {
+          console.log(
+            `[CutTheRopeMagic] EnergyTime: ${saveData.CutTheRopeMagic_EnergyTime} (${energytimechanged ? "changed" : "ok"}), ` +
+            `Energy: ${saveData.CutTheRopeMagic_Energy} (${energychanged ? "changed" : "ok"})`
+          );
+        }
+      }; setInterval(() => patchsave(false), 500);
+      setInterval(() => patchsave(true), 10000);
+    })();
   </script>
 </head>
 
