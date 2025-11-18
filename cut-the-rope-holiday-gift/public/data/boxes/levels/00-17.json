@@ -1,0 +1,350 @@
+{
+    "settings": [
+        {
+            "name": 0,
+            "width": 320,
+            "height": 480,
+            "gridSize": 32
+        },
+        {
+            "name": 1,
+            "ropePhysicsSpeed": 1,
+            "special": 1,
+            "twoParts": false,
+            "water": 0,
+            "waterSpeed": 0
+        }
+    ],
+    "objects": [
+        {
+            "name": 3,
+            "x": 246,
+            "y": 254,
+            "timeout": -1
+        },
+        {
+            "name": 3,
+            "x": 266,
+            "y": 417,
+            "timeout": -1
+        },
+        {
+            "name": 3,
+            "x": 129,
+            "y": 347,
+            "timeout": -1
+        },
+        {
+            "name": 2,
+            "x": 259,
+            "y": 69
+        },
+        {
+            "name": 100,
+            "x": 186,
+            "y": 158,
+            "length": 100,
+            "radius": 60,
+            "moveLength": -1,
+            "moveOffset": 0,
+            "wheel": false,
+            "gun": false,
+            "kickable": false,
+            "kicked": false,
+            "invisible": false,
+            "moveVertical": false,
+            "spider": false,
+            "helicopter": false,
+            "part": "L"
+        },
+        {
+            "name": 100,
+            "x": 187,
+            "y": 351,
+            "length": 100,
+            "radius": 60,
+            "moveLength": -1,
+            "moveOffset": 0,
+            "wheel": false,
+            "gun": false,
+            "kickable": false,
+            "kicked": false,
+            "invisible": false,
+            "moveVertical": false,
+            "spider": false,
+            "helicopter": false,
+            "part": "L"
+        },
+        {
+            "name": 52,
+            "x": 94,
+            "y": 135
+        },
+        {
+            "name": 100,
+            "x": 185,
+            "y": 253,
+            "length": 100,
+            "radius": 60,
+            "moveLength": -1,
+            "moveOffset": 0,
+            "wheel": false,
+            "gun": false,
+            "kickable": false,
+            "kicked": false,
+            "invisible": false,
+            "moveVertical": false,
+            "spider": false,
+            "helicopter": false,
+            "part": "L"
+        },
+        {
+            "name": 100,
+            "x": 41,
+            "y": 37,
+            "length": 70,
+            "radius": -1,
+            "moveLength": -1,
+            "moveOffset": 0,
+            "wheel": false,
+            "gun": false,
+            "kickable": false,
+            "kicked": false,
+            "invisible": false,
+            "moveVertical": false,
+            "spider": false,
+            "helicopter": false,
+            "part": "L"
+        },
+        {
+            "name": 100,
+            "x": 148,
+            "y": 37,
+            "length": 70,
+            "radius": -1,
+            "moveLength": -1,
+            "moveOffset": 0,
+            "wheel": false,
+            "gun": false,
+            "kickable": false,
+            "kicked": false,
+            "invisible": false,
+            "moveVertical": false,
+            "spider": false,
+            "helicopter": false,
+            "part": "L"
+        },
+        {
+            "name": 4,
+            "x": 5,
+            "y": 190,
+            "locale": "en",
+            "text": "Automatic ropes appear when candy gets into their area",
+            "width": 130
+        },
+        {
+            "name": 8,
+            "x": 98,
+            "y": 181,
+            "moveSpeed": 100,
+            "rotateSpeed": 100,
+            "locale": "en",
+            "angle": 180
+        },
+        {
+            "name": 54,
+            "x": 266,
+            "y": 417
+        }
+    ],
+    "br": [
+        {
+            "name": 8,
+            "x": 100,
+            "y": 180,
+            "moveSpeed": 100,
+            "rotateSpeed": 100,
+            "locale": "br",
+            "angle": 180
+        },
+        {
+            "name": 4,
+            "x": 5,
+            "y": 190,
+            "locale": "br",
+            "text": "Cordas aparecem automaticamente quando há doces na área delas",
+            "width": 150
+        }
+    ],
+    "de": [
+        {
+            "name": 8,
+            "x": 100,
+            "y": 180,
+            "moveSpeed": 100,
+            "rotateSpeed": 100,
+            "locale": "de",
+            "angle": 180
+        },
+        {
+            "name": 4,
+            "x": 5,
+            "y": 189,
+            "locale": "de",
+            "text": "Seile erscheinen automatisch, wenn die Süßigkeit in ihrem Bereich ist",
+            "width": 160
+        }
+    ],
+    "es": [
+        {
+            "name": 8,
+            "x": 100,
+            "y": 180,
+            "moveSpeed": 100,
+            "rotateSpeed": 100,
+            "locale": "es",
+            "angle": 180
+        },
+        {
+            "name": 4,
+            "x": 5,
+            "y": 190,
+            "locale": "es",
+            "text": "Las autocuerdas aparecen cuando el caramelo se acerca a ellas.",
+            "width": 150
+        }
+    ],
+    "fr": [
+        {
+            "name": 8,
+            "x": 98,
+            "y": 180,
+            "moveSpeed": 100,
+            "rotateSpeed": 100,
+            "locale": "fr",
+            "angle": 180
+        },
+        {
+            "name": 4,
+            "x": 5,
+            "y": 190,
+            "locale": "fr",
+            "text": "Des cordes automatiques apparaissent quand le bonbon pénètre dans leur zone",
+            "width": 150
+        }
+    ],
+    "it": [
+        {
+            "name": 8,
+            "x": 100,
+            "y": 180,
+            "moveSpeed": 100,
+            "rotateSpeed": 100,
+            "locale": "it",
+            "angle": 180
+        },
+        {
+            "name": 4,
+            "x": 5,
+            "y": 190,
+            "locale": "it",
+            "text": "Le corde automatiche compaiono quando un bonbon si avvicina",
+            "width": 150
+        }
+    ],
+    "ja": [
+        {
+            "name": 8,
+            "x": 100,
+            "y": 180,
+            "moveSpeed": 100,
+            "rotateSpeed": 100,
+            "locale": "ja",
+            "angle": 180
+        },
+        {
+            "name": 4,
+            "x": 0,
+            "y": 190,
+            "locale": "ja",
+            "text": "キャンディが*接近すると*自動式ロープが*現われます",
+            "width": 150
+        }
+    ],
+    "ko": [
+        {
+            "name": 8,
+            "x": 100,
+            "y": 180,
+            "moveSpeed": 100,
+            "rotateSpeed": 100,
+            "locale": "ko",
+            "angle": 180
+        },
+        {
+            "name": 4,
+            "x": 5,
+            "y": 190,
+            "locale": "ko",
+            "text": "사탕이 영역에 들어오면 *자동으로 줄이 이어져요.",
+            "width": 150
+        }
+    ],
+    "nl": [
+        {
+            "name": 8,
+            "x": 100,
+            "y": 180,
+            "moveSpeed": 100,
+            "rotateSpeed": 100,
+            "locale": "nl",
+            "angle": 180
+        },
+        {
+            "name": 4,
+            "x": 5,
+            "y": 190,
+            "locale": "nl",
+            "text": "Er verschijnen automatisch touwen wanneer het snoepje er in de buurt komt",
+            "width": 150
+        }
+    ],
+    "ru": [
+        {
+            "name": 8,
+            "x": 100,
+            "y": 181,
+            "moveSpeed": 100,
+            "rotateSpeed": 100,
+            "locale": "ru",
+            "angle": 180
+        },
+        {
+            "name": 4,
+            "x": 6,
+            "y": 190,
+            "locale": "ru",
+            "text": "Авто-веревки появляются, когда леденец попадает в их радиус",
+            "width": 150
+        }
+    ],
+    "zh": [
+        {
+            "name": 8,
+            "x": 100,
+            "y": 180,
+            "moveSpeed": 100,
+            "rotateSpeed": 100,
+            "locale": "zh",
+            "angle": 180
+        },
+        {
+            "name": 4,
+            "x": 5,
+            "y": 190,
+            "locale": "zh",
+            "text": "自动绳会在糖果进入 相应区域时出现",
+            "width": 150
+        }
+    ]
+}
