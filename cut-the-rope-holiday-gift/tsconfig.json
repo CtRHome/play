@@ -3,12 +3,12 @@
     "compilerOptions": {
         "forceConsistentCasingInFileNames": true,
         // File Layout
-        // "rootDir": "./src",
-        // "outDir": "./dist",
+        // "rootDir": "/play/cut-the-rope-holiday-gift/src",
+        // "outDir": "/play/cut-the-rope-holiday-gift/dist",
 
-        "baseUrl": ".",
+        "baseUrl": "/play/cut-the-rope-holiday-gift/",
         "paths": {
-            "@/*": ["src/*"]
+            "@/*": ["/play/cut-the-rope-holiday-gift/src/*"]
         },
 
         // Environment Settings
