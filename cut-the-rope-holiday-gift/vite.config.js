@@ -20,7 +20,7 @@ export default defineConfig(({ mode }) => {
             enablePWA &&
                 VitePWA({
                     registerType: "autoUpdate",
-                    includeAssets: ["index.html", "favicon.ico", "css/ctr.css"],
+                    includeAssets: ["index.html", "favicon.ico", "/play/cut-the-rope-holiday-gift/css/ctr.css"],
                     devOptions: {
                         enabled: false,
                     },
@@ -150,7 +150,7 @@ export default defineConfig(({ mode }) => {
                         groups: [
                             {
                                 name(moduleId) {
-                                    const idx = moduleId.indexOf("src/");
+                                    const idx = moduleId.indexOf("/play/cut-the-rope-holiday-gift/src/");
                                     if (idx >= 0) {
                                         let srcPath = moduleId.slice(idx + 5); // after '/src/'
                                         srcPath = srcPath.replace(/\.(js|ts|jsx|tsx)$/, "");
