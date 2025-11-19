@@ -59,7 +59,7 @@ export default defineConfig(({ mode }) => {
                             {
                                 urlPattern: ({ request, url }) =>
                                     request.destination === "style" ||
-                                    url.pathname.includes("css/"),
+                                    url.pathname.includes("/play/cut-the-rope-holiday-gift/css/"),
                                 handler: "StaleWhileRevalidate",
                                 options: {
                                     cacheName: `ctr-styles-${APP_VERSION}`,
@@ -75,7 +75,7 @@ export default defineConfig(({ mode }) => {
                             {
                                 urlPattern: ({ request, url }) =>
                                     request.destination === "image" ||
-                                    url.pathname.includes("images/"),
+                                    url.pathname.includes("/play/cut-the-rope-holiday-gift/images/"),
                                 handler: "CacheFirst",
                                 options: {
                                     cacheName: `ctr-images-${APP_VERSION}`,
@@ -91,7 +91,7 @@ export default defineConfig(({ mode }) => {
                             {
                                 urlPattern: ({ request, url }) =>
                                     request.destination === "font" ||
-                                    url.pathname.includes("fonts/"),
+                                    url.pathname.includes("/play/cut-the-rope-holiday-gift/fonts/"),
                                 handler: "CacheFirst",
                                 options: {
                                     cacheName: `ctr-fonts-${APP_VERSION}`,
@@ -106,7 +106,7 @@ export default defineConfig(({ mode }) => {
                             {
                                 urlPattern: ({ request, url }) =>
                                     request.destination === "audio" ||
-                                    url.pathname.includes("audio/"),
+                                    url.pathname.includes("/play/cut-the-rope-holiday-gift/audio/"),
                                 handler: "CacheFirst",
                                 options: {
                                     cacheName: `ctr-audio-${APP_VERSION}`,
@@ -121,7 +121,7 @@ export default defineConfig(({ mode }) => {
                             {
                                 urlPattern: ({ url }) =>
                                     url.pathname.endsWith(".json") &&
-                                    url.pathname.includes("data/"),
+                                    url.pathname.includes("/play/cut-the-rope-holiday-gift/data/"),
                                 handler: "NetworkFirst",
                                 options: {
                                     cacheName: `ctr-json-${APP_VERSION}`,
