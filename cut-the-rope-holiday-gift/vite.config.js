@@ -11,7 +11,7 @@ const APP_VERSION = "4";
 
 export default defineConfig(({ mode }) => {
     const isDev = mode === "development";
-    const base = process.env.VITE_BASE_NETLIFY || (isDev ? "/" : "/");
+    const base = process.env.VITE_BASE_NETLIFY || (isDev ? "/" : "/play/cut-the-rope-holiday-gift");
     const enablePWA = !process.env.VITE_BASE_NETLIFY;
 
     return {
