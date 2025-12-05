@@ -1,0 +1,63 @@
+{
+  "toolGameId": "HzYcH8HlOE5zKiMbtBdk",
+  "gameId": "cut-the-rope-experiments",
+  "name": "Cut the Rope: Experiments",
+  "version": "0.0.8",
+  "exportedAt": "2025-11-21T15:59:34.822Z",
+  "features": {
+    "audio": true,
+    "copyright": true,
+    "credits": true,
+    "pause": true,
+    "progress": true,
+    "score": true,
+    "tutorial": true,
+    "version": true,
+    "visibilitychange": true,
+    "iap": true,
+    "home": true,
+    "privacy": true
+  },
+  "ads": {
+    "initial": {
+      "timeout": 250,
+      "retry": 2000,
+      "preload": 250,
+      "enabled": false
+    },
+    "interstitial": {
+      "cooldown": 60,
+      "timeout": 250,
+      "enabled": true,
+      "retry": 2000,
+      "preload": 250,
+      "eventIds": [
+        "button:pause:menu",
+        "button:game:restart",
+        "break:defeat",
+        "button:result:restart",
+        "button:result:next",
+        "button:result:menu"
+      ]
+    },
+    "rewarded": {
+      "timeout": 250,
+      "enabled": true,
+      "retry": 2000,
+      "preload": 500,
+      "eventIds": [
+        "button:popup:energy"
+      ]
+    },
+    "banner": {
+      "preload": 250,
+      "retry": 2000,
+      "enabled": false,
+      "timeout": 250
+    }
+  },
+  "storage": {
+    "shouldCompress": false
+  },
+  "famobi": {}
+}
