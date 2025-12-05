@@ -28,7 +28,7 @@
     "interstitial": {
       "cooldown": 60,
       "timeout": 250,
-      "enabled": true,
+      "enabled": false,
       "retry": 2000,
       "preload": 250,
       "eventIds": [
