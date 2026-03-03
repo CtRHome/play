@@ -1,0 +1,213 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" name="viewport">
+    <title>Cut The Rope Time Travel</title>
+    <style>
+
+        html {height: 100%; width: 100%}
+        body {
+            padding: 0; margin: 0;
+            height: 100%; width: 100%;
+            text-align: center;
+            background: #000 url("ttsplash.webp") center bottom / cover no-repeat;
+            overflow: hidden; position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+        }
+
+        .game {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            margin: 0; border: 0;
+            overflow: hidden; display: block;
+            image-rendering: auto; -ms-interpolation-mode: bicubic;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas class="game" id="canvas" oncontextmenu="event.preventDefault();"></canvas>
+    <script>
+        window.__CTRTT_BUILD_INDEX__ = 60;
+        !function () {
+            try {
+                var t = document.getElementById("canvas");
+                t && (
+                    t.style.position = "absolute",
+                    t.style.left = "0",
+                    t.style.top = "0",
+                    t.style.width = "100%",
+                    t.style.height = "100%"
+                );
+            } catch (t) { }
+        }();
+    </script>
+    <script>
+        (function () {
+            function applyOffsets(ofs) {
+                try {
+                    var canvas = document.getElementById("canvas");
+                    if (!canvas || !ofs) return;
+                    var left = 0 | ofs.left, top = 0 | ofs.top,
+                        right = 0 | ofs.right, bottom = 0 | ofs.bottom;
+                    canvas.style.left = left + "px"; canvas.style.top = top + "px";
+                    canvas.style.right = ""; canvas.style.bottom = "";
+                    canvas.style.width = "calc(100% - " + (left + right) + "px)";
+                    canvas.style.height = "calc(100% - " + (top + bottom) + "px)";
+                    setTimeout(function () {
+                        if (typeof _on_canvas_resize === "function") _on_canvas_resize();
+                    }, 0);
+                } catch (_) { }
+            }
+            if (typeof window.GameInterface === "undefined") {
+                window.GameInterface = {
+                    isMuted: function () { return false; },
+                    sendPreloadProgress: function () { },
+                    onOffsetChange: function () { },
+                    getOffsets: function () { return { left: 0, top: 0, right: 0, bottom: 0 }; },
+                    showInterstitialAd: function () { return Promise.resolve(); },
+                    showRewardedAd: function () { return Promise.resolve({ isRewardGranted: true }); },
+                    hasRewardedAd: function () { return Promise.resolve(true); },
+                    gameReady: function () { },
+                    gameStart: function () { },
+                    gameOver: function () { },
+                    gameComplete: function () { }
+                };
+            }
+
+            try {
+                if (window.GameInterface && typeof window.GameInterface.onOffsetChange === "function") {
+                    window.GameInterface.onOffsetChange(applyOffsets);
+                }
+                if (window.GameInterface && typeof window.GameInterface.getOffsets === "function") {
+                    Promise.resolve(window.GameInterface.getOffsets()).then(applyOffsets).catch(function () { });
+                } else {
+                    applyOffsets({ left: 0, top: 0, right: 0, bottom: 0 });
+                }
+            } catch (_) { }
+        })();
+    </script>
+    <script src="fflate.js"></script>
+    <script>
+        (function () {
+            function decodeparam() {
+                var params = new URLSearchParams(window.location.search);
+                var raw = params.get("data");
+                if (!raw) return null;
+                try {
+                    raw = decodeURIComponent(raw);
+                } catch (_) { }
+                function b64ToBinary(str) {
+                    try {
+                        return atob(str);
+                    } catch (_) {
+                        return null;
+                    }
+                }
+                function bintuahu8(bin) {
+                    var len = bin.length;
+                    var out = new Uint8Array(len);
+                    for (var i = 0; i < len; i++) out[i] = bin.charCodeAt(i) & 0xff;
+                    return out;
+                }
+                var b64 = raw.replace(/-/g, "+").replace(/_/g, "/");
+                while (b64.length % 4 !== 0) b64 += "=";
+                var bin = b64ToBinary(b64);
+                if (bin !== null) {
+                    try {
+                        if (typeof fflate !== "undefined") {
+                            var u8 = bintuahu8(bin);
+                            if (u8.length >= 2 && u8[0] === 0x1f && u8[1] === 0x8b) {
+                                var inflated = fflate.decompressSync(u8);
+                                return fflate.strFromU8(inflated);
+                            }
+                        }
+                    } catch (_) { }
+                    try {
+                        var u8plain = bintuahu8(bin);
+                        return (typeof fflate !== "undefined" && fflate.strFromU8)
+                            ? fflate.strFromU8(u8plain)
+                            : bin;
+                    } catch (_) { }
+                }
+                return raw;
+            }
+
+            var xml = decodeparam();
+            if (!xml || typeof xml !== "string") return;
+            // strip xml comments (<!-- ... -->)
+            xml = xml.replace(/<!--[\s\S]*?-->/g, "");
+            window.__CUSTOM_LEVEL_XML__ = xml;
+        })();
+    </script>
+    <script>
+        (function () {
+
+            // attempt to rewrite localstorage
+            var KEY = "CTRTT_PREFS__ALL";
+            function patchPrefsObject(obj) {
+                if (!obj || typeof obj !== "object") obj = {};
+                obj.CTRTT_PREFS_PREFS_SUPERPOWERS_COUNT = "999";
+                obj.CTRTT_PREFS_PREFS_HINTS_COUNT = "999";
+                obj.CTRTT_PREFS_PREFS_HINTS_BOUGHT = "999";
+                obj.CTRTT_PREFS_PREFS_FREE_HINTS_GIFT = "999";
+                obj.CTRTT_PREFS_PREFS_FREE_HINTS_RECEIVED = "999";
+                obj.CTRTT_PREFS_PREF_SUBSC_DAILY_REWARD_HINT = "999";
+                obj.CTRTT_PREFS_SUBSCRIPTION_IS_ACTIVE_PREF = "1";
+                return obj;
+            }
+            function patchPrefsString(raw) {
+                if (typeof raw !== "string" || !raw) return raw;
+                try {
+                    return JSON.stringify(patchPrefsObject(JSON.parse(raw)));
+                } catch (_) {
+                    return raw;
+                }
+            }
+            try {
+                var ls = localStorage;
+                var origGet = ls.getItem.bind(ls);
+                var origSet = ls.setItem.bind(ls);
+                try {
+                    var v0 = origGet(KEY);
+                    if (typeof v0 === "string" && v0) origSet(KEY, patchPrefsString(v0));
+                } catch (_) { }
+                ls.getItem = function (k) {
+                    var v = origGet(k);
+                    return (k === KEY) ? patchPrefsString(v) : v;
+                };
+                ls.setItem = function (k, v) {
+                    if (k === KEY) v = patchPrefsString(v);
+                    return origSet(k, v);
+                };
+                setInterval(function () {
+                    try {
+                        var v = origGet(KEY);
+                        if (typeof v === "string" && v) {
+                            var pv = patchPrefsString(v);
+                            if (pv !== v) origSet(KEY, pv);
+                        }
+                    } catch (_) { }
+                }, 1000);
+            } catch (_) { }
+        })();
+    </script>
+    <script>
+        // When the game is ready, switch to a solid black background so
+        // semi‑transparent canvas pixels don't show the splash image.
+        (function () {
+            var originalGameReady = window.GameInterface && window.GameInterface.gameReady;
+            if (!window.GameInterface) window.GameInterface = {};
+            window.GameInterface.gameReady = function () {
+                try {
+                    document.body.style.background = "#000";
+                } catch (_) { }
+                if (typeof originalGameReady === "function") {
+                    try { originalGameReady(); } catch (_) { }
+                }
+            };
+        })();
+    </script>
+    <script src="ctrttboot.js"></script>
+</body>
+</html>
