@@ -1,3 +1,6 @@
-*_framework/** text eol=lf
-*.js text eol=lf
-*.mjs text eol=lf
+# Match _framework at any folder depth
+**/_framework/** -text
+
+# Match all JS and MJS files at any folder depth
+**/*.js text eol=lf
+**/*.mjs text eol=lf
