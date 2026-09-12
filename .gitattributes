@@ -1,6 +1,2 @@
-# Match _framework at any folder depth
+# Treat all published framework assets as binary to preserve raw bytes and SRI digests
 **/_framework/** -text
-
-# Match all JS and MJS files at any folder depth
-**/*.js text eol=lf
-**/*.mjs text eol=lf
