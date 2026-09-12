@@ -1,5 +1,5 @@
 self.assetsManifest = {
-  "version": "AqZ7NAhs",
+  "version": "sTvCJg4d",
   "assets": [
     {
       "hash": "sha256-JDpCVBUbB7fGY/LintnRbAtW7D9V7efK1M5QXGERcvY=",
@@ -1790,7 +1790,7 @@ self.assetsManifest = {
       "url": "content/sounds/sfx/zepto_logo_bubbles.ogg"
     },
     {
-      "hash": "sha256-jGy5DwZtwvqeNfpopEAz4VxAq+pV2oUzYJUGibQAu/4=",
+      "hash": "sha256-aB+pxopgNljWtP5RLA5GHU7OWu/CJxQBcttiYVSJDLY=",
       "url": "content/tier0.json"
     },
     {
