@@ -1,0 +1,50 @@
+{
+  "name": "ctrmagic",
+  "version": "6",
+  "symbols": "1",
+  "origin": "c++",
+  "engineVersion": "",
+  "webglAttributes": {
+      "maxWebGLVersion": 1
+  },
+  "runtime": {
+      "aspect": [
+          0.66,
+          0.95
+      ],
+      "orientation": "portrait",
+      "res": [
+          {
+              "glob": "emscripten/**",
+              "root": "emscripten/"
+          }
+      ]
+  },
+  "backendVersion": 31,
+  "tinyLoaderScript": "scripts/tiny-loader.js",
+  "sdkScripts": [
+      "scripts/sdk.js",
+      "scripts/gamepix-adapter.js"
+  ],
+  "workerScripts": {
+      "browserImageLoader": "scripts/browser-image-loader.js",
+      "wasmImageLoader": {
+          "wasm": "scripts/wasm-image-loader.wasm",
+          "wasmJs": "scripts/wasm-image-loader.js"
+      }
+  },
+  "sizes": {
+      "br/wbin.js.br": 45745,
+      "br/wbin._.js.br": 722662,
+      "br/bin.data.js.br": 5774,
+      "br/bin.data._.js.br": 1979084,
+      "gz/wbin.js.gz": 53376,
+      "gz/wbin._.js.gz": 942451,
+      "gz/bin.data.js.gz": 7508,
+      "gz/bin.data._.js.gz": 2321141,
+      "wbin.js": 209001,
+      "wbin._.js": 2530942,
+      "bin.data.js": 35534,
+      "bin.data._.js": 7512049
+  }
+}

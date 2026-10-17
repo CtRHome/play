@@ -1,0 +1,189 @@
+
+  if (!Module.expectedDataFileDownloads) {
+    Module.expectedDataFileDownloads = 0;
+  }
+
+  Module.expectedDataFileDownloads++;
+  (function() {
+    // Do not attempt to redownload the virtual filesystem data when in a pthread or a Wasm Worker context.
+    if (Module['ENVIRONMENT_IS_PTHREAD'] || Module['$ww']) return;
+    var loadPackage = function(metadata) {
+
+      var PACKAGE_PATH = '';
+      if (typeof window === 'object') {
+        PACKAGE_PATH = window['encodeURIComponent'](window.location.pathname.toString().substring(0, window.location.pathname.toString().lastIndexOf('/')) + '/');
+      } else if (typeof process === 'undefined' && typeof location !== 'undefined') {
+        // web worker
+        PACKAGE_PATH = encodeURIComponent(location.pathname.toString().substring(0, location.pathname.toString().lastIndexOf('/')) + '/');
+      }
+      var PACKAGE_NAME = 'bin.data._.wasm';
+      var REMOTE_PACKAGE_BASE = 'bin.data._.wasm';
+      if (typeof Module['locateFilePackage'] === 'function' && !Module['locateFile']) {
+        Module['locateFile'] = Module['locateFilePackage'];
+        err('warning: you defined Module.locateFilePackage, that has been renamed to Module.locateFile (using your locateFilePackage for now)');
+      }
+      var REMOTE_PACKAGE_NAME = Module['locateFile'] ? Module['locateFile'](REMOTE_PACKAGE_BASE, '') : REMOTE_PACKAGE_BASE;
+var REMOTE_PACKAGE_SIZE = metadata['remote_package_size'];
+
+      function fetchRemotePackage(packageName, packageSize, callback, errback) {
+        if (typeof process === 'object' && typeof process.versions === 'object' && typeof process.versions.node === 'string') {
+          require('fs').readFile(packageName, function(err, contents) {
+            if (err) {
+              errback(err);
+            } else {
+              callback(contents.buffer);
+            }
+          });
+          return;
+        }
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', packageName, true);
+        xhr.responseType = 'arraybuffer';
+        xhr.onprogress = function(event) {
+          var url = packageName;
+          var size = packageSize;
+          if (event.total) size = event.total;
+          if (event.loaded) {
+            if (!xhr.addedTotal) {
+              xhr.addedTotal = true;
+              if (!Module.dataFileDownloads) Module.dataFileDownloads = {};
+              Module.dataFileDownloads[url] = {
+                loaded: event.loaded,
+                total: size
+              };
+            } else {
+              Module.dataFileDownloads[url].loaded = event.loaded;
+            }
+            var total = 0;
+            var loaded = 0;
+            var num = 0;
+            for (var download in Module.dataFileDownloads) {
+            var data = Module.dataFileDownloads[download];
+              total += data.total;
+              loaded += data.loaded;
+              num++;
+            }
+            total = Math.ceil(total * Module.expectedDataFileDownloads/num);
+            if (Module['setStatus']) Module['setStatus'](`Downloading data... (${loaded}/${total})`);
+          } else if (!Module.dataFileDownloads) {
+            if (Module['setStatus']) Module['setStatus']('Downloading data...');
+          }
+        };
+        xhr.onerror = function(event) {
+          throw new Error("NetworkError for: " + packageName);
+        }
+        xhr.onload = function(event) {
+          if (xhr.status == 200 || xhr.status == 304 || xhr.status == 206 || (xhr.status == 0 && xhr.response)) { // file URLs can return 0
+            var packageData = xhr.response;
+            callback(packageData);
+          } else {
+            throw new Error(xhr.statusText + " : " + xhr.responseURL);
+          }
+        };
+        xhr.send(null);
+      };
+
+      function handleError(error) {
+        console.error('package error:', error);
+      };
+
+      var fetchedCallback = null;
+      var fetched = Module['getPreloadedPackage'] ? Module['getPreloadedPackage'](REMOTE_PACKAGE_NAME, REMOTE_PACKAGE_SIZE) : null;
+
+      if (!fetched) fetchRemotePackage(REMOTE_PACKAGE_NAME, REMOTE_PACKAGE_SIZE, function(data) {
+        if (fetchedCallback) {
+          fetchedCallback(data);
+          fetchedCallback = null;
+        } else {
+          fetched = data;
+        }
+      }, handleError);
+
+    function runWithFS() {
+
+      function assert(check, msg) {
+        if (!check) throw msg + new Error().stack;
+      }
+Module['FS_createPath']("/", "fx", true, true);
+Module['FS_createPath']("/", "maps", true, true);
+Module['FS_createPath']("/maps", "Tuts", true, true);
+Module['FS_createPath']("/maps", "bosses", true, true);
+Module['FS_createPath']("/maps", "pack1a", true, true);
+Module['FS_createPath']("/maps", "pack2", true, true);
+Module['FS_createPath']("/maps", "pack3a", true, true);
+Module['FS_createPath']("/maps", "pack4", true, true);
+Module['FS_createPath']("/maps", "pack4a", true, true);
+Module['FS_createPath']("/maps", "pack5", true, true);
+Module['FS_createPath']("/maps", "pack5a", true, true);
+Module['FS_createPath']("/maps", "pack6", true, true);
+Module['FS_createPath']("/maps", "pack6a", true, true);
+
+      /** @constructor */
+      function DataRequest(start, end, audio) {
+        this.start = start;
+        this.end = end;
+        this.audio = audio;
+      }
+      DataRequest.prototype = {
+        requests: {},
+        open: function(mode, name) {
+          this.name = name;
+          this.requests[name] = this;
+          Module['addRunDependency'](`fp ${this.name}`);
+        },
+        send: function() {},
+        onload: function() {
+          var byteArray = this.byteArray.subarray(this.start, this.end);
+          this.finish(byteArray);
+        },
+        finish: function(byteArray) {
+          var that = this;
+          // canOwn this data in the filesystem, it is a slide into the heap that will never change
+          Module['FS_createDataFile'](this.name, null, byteArray, true, true, true);
+          Module['removeRunDependency'](`fp ${that.name}`);
+          this.requests[this.name] = null;
+        }
+      };
+
+      var files = metadata['files'];
+      for (var i = 0; i < files.length; ++i) {
+        new DataRequest(files[i]['start'], files[i]['end'], files[i]['audio'] || 0).open('GET', files[i]['filename']);
+      }
+
+      function processPackageData(arrayBuffer) {
+        assert(arrayBuffer, 'Loading data file failed.');
+        assert(arrayBuffer.constructor.name === ArrayBuffer.name, 'bad input to processPackageData');
+        var byteArray = new Uint8Array(arrayBuffer);
+        var curr;
+        // Reuse the bytearray from the XHR as the source for file reads.
+          DataRequest.prototype.byteArray = byteArray;
+          var files = metadata['files'];
+          for (var i = 0; i < files.length; ++i) {
+            DataRequest.prototype.requests[files[i].filename].onload();
+          }          Module['removeRunDependency']('datafile_bin.data._.js');
+
+      };
+      Module['addRunDependency']('datafile_bin.data._.js');
+
+      if (!Module.preloadResults) Module.preloadResults = {};
+
+      Module.preloadResults[PACKAGE_NAME] = {fromCache: false};
+      if (fetched) {
+        processPackageData(fetched);
+        fetched = null;
+      } else {
+        fetchedCallback = processPackageData;
+      }
+
+    }
+    if (Module['calledRun']) {
+      runWithFS();
+    } else {
+      if (!Module['preRun']) Module['preRun'] = [];
+      Module["preRun"].push(runWithFS); // FS is not initialized yet, wait for it
+    }
+
+    }
+    loadPackage({"files": [{"filename": "/AraJozoor-Regular.otf", "start": 0, "end": 62848}, {"filename": "/GoodDog_New.otf", "start": 62848, "end": 92864}, {"filename": "/about_640_960.raw", "start": 92864, "end": 94516}, {"filename": "/areas_01_640_960.raw", "start": 94516, "end": 140849}, {"filename": "/areas_02_640_960.raw", "start": 140849, "end": 154733}, {"filename": "/areas_dive_640_960.raw", "start": 154733, "end": 157963}, {"filename": "/areas_ghost_640_960.raw", "start": 157963, "end": 160812}, {"filename": "/areas_power_640_960.raw", "start": 160812, "end": 163700}, {"filename": "/areas_walk_640_960.raw", "start": 163700, "end": 165923}, {"filename": "/banner_bar_640_960.raw", "start": 165923, "end": 167237}, {"filename": "/bckgr_1_sky.pb", "start": 167237, "end": 177557}, {"filename": "/bckgr_1_sky_01_640_960.webp", "start": 177557, "end": 199597}, {"filename": "/bckgr_1_sky_02_640_960.webp", "start": 199597, "end": 209420}, {"filename": "/bckgr_1_sky_back_640_960.webp", "start": 209420, "end": 215516}, {"filename": "/bckgr_2_snails.pb", "start": 215516, "end": 222952}, {"filename": "/bckgr_2_snails_01_640_960.webp", "start": 222952, "end": 243048}, {"filename": "/bckgr_2_snails_back_640_960.webp", "start": 243048, "end": 259085}, {"filename": "/bckgr_dive.pb", "start": 259085, "end": 278185}, {"filename": "/bckgr_dive_01_640_960.webp", "start": 278185, "end": 293786}, {"filename": "/bckgr_dive_back_640_960.webp", "start": 293786, "end": 300614}, {"filename": "/bckgr_ghost.pb", "start": 300614, "end": 337951}, {"filename": "/bckgr_ghost_01_640_960.raw", "start": 337951, "end": 344694}, {"filename": "/bckgr_ghost_back_640_960.webp", "start": 344694, "end": 351968}, {"filename": "/bckgr_power_640_960.webp", "start": 351968, "end": 359185}, {"filename": "/bckgr_walk.pb", "start": 359185, "end": 381792}, {"filename": "/bckgr_walk_01_640_960.webp", "start": 381792, "end": 391412}, {"filename": "/bckgr_walk_back_640_960.webp", "start": 391412, "end": 401405}, {"filename": "/binding_button_pump_640_960.raw", "start": 401405, "end": 403822}, {"filename": "/binding_button_pump_old_640_960.raw", "start": 403822, "end": 416141}, {"filename": "/blackout_640_960.raw", "start": 416141, "end": 416714}, {"filename": "/blob.pb", "start": 416714, "end": 418872}, {"filename": "/blob_640_960.raw", "start": 418872, "end": 420147}, {"filename": "/bookshelf.pb", "start": 420147, "end": 421768}, {"filename": "/boss.pb", "start": 421768, "end": 579412}, {"filename": "/boss_640_960.raw", "start": 579412, "end": 590962}, {"filename": "/boss_candy.pb", "start": 590962, "end": 593729}, {"filename": "/btm_popup_more_apps.pb", "start": 593729, "end": 596198}, {"filename": "/bulb.pb", "start": 596198, "end": 600372}, {"filename": "/bulb_640_960.raw", "start": 600372, "end": 603739}, {"filename": "/button_google.pb", "start": 603739, "end": 609164}, {"filename": "/button_google_640_960.raw", "start": 609164, "end": 609951}, {"filename": "/button_long.pb", "start": 609951, "end": 613671}, {"filename": "/button_long_640_960.raw", "start": 613671, "end": 617675}, {"filename": "/button_round.pb", "start": 617675, "end": 623539}, {"filename": "/button_round_640_960.raw", "start": 623539, "end": 666590}, {"filename": "/button_short.pb", "start": 666590, "end": 670666}, {"filename": "/button_short_640_960.raw", "start": 670666, "end": 675298}, {"filename": "/button_square.pb", "start": 675298, "end": 680078}, {"filename": "/button_square_640_960.raw", "start": 680078, "end": 683667}, {"filename": "/buttons.pb", "start": 683667, "end": 743334}, {"filename": "/buttons_640_960.raw", "start": 743334, "end": 767641}, {"filename": "/candy_640_960.png", "start": 767641, "end": 772200}, {"filename": "/candy_leg.pb", "start": 772200, "end": 783970}, {"filename": "/chest_result.pb", "start": 783970, "end": 797646}, {"filename": "/common_screen_640_960.raw", "start": 797646, "end": 805545}, {"filename": "/common_screen_shading_640_960.raw", "start": 805545, "end": 808299}, {"filename": "/coppa_screen_new_640_960.png", "start": 808299, "end": 832562}, {"filename": "/counter_640_960.raw", "start": 832562, "end": 840469}, {"filename": "/decor_back_01_640_960.raw", "start": 840469, "end": 844143}, {"filename": "/decor_back_02_640_960.raw", "start": 844143, "end": 846686}, {"filename": "/decor_dive_640_960.raw", "start": 846686, "end": 849450}, {"filename": "/decor_ghost_640_960.raw", "start": 849450, "end": 854495}, {"filename": "/decor_ice_640_960.raw", "start": 854495, "end": 858619}, {"filename": "/decor_power_640_960.raw", "start": 858619, "end": 862775}, {"filename": "/decor_walk_640_960.raw", "start": 862775, "end": 866602}, {"filename": "/disconnect_popup_640_960.raw", "start": 866602, "end": 868912}, {"filename": "/endgame_popup_magic_640_960.raw", "start": 868912, "end": 877819}, {"filename": "/energy.pb", "start": 877819, "end": 953094}, {"filename": "/energy_640_960.raw", "start": 953094, "end": 962985}, {"filename": "/energy_common_640_960.raw", "start": 962985, "end": 972216}, {"filename": "/energy_common_bg_640_960.raw", "start": 972216, "end": 972476}, {"filename": "/explosion_dragon.pb", "start": 972476, "end": 1000746}, {"filename": "/explosion_dragon_640_960.raw", "start": 1000746, "end": 1001980}, {"filename": "/ftp_player_new_640_960.raw", "start": 1001980, "end": 1012294}, {"filename": "/fx/ability_bloc.zps", "start": 1012294, "end": 1015447}, {"filename": "/fx/ability_btn.zps", "start": 1015447, "end": 1017075}, {"filename": "/fx/ability_btn_idle.zps", "start": 1017075, "end": 1018075}, {"filename": "/fx/ability_btn_idle_2.zps", "start": 1018075, "end": 1018782}, {"filename": "/fx/blob.zps", "start": 1018782, "end": 1022712}, {"filename": "/fx/blok.zps", "start": 1022712, "end": 1030576}, {"filename": "/fx/cheese_smell.zps", "start": 1030576, "end": 1032479}, {"filename": "/fx/chest_part.zps", "start": 1032479, "end": 1034069}, {"filename": "/fx/dust_collection.zps", "start": 1034069, "end": 1038659}, {"filename": "/fx/dust_collection_hint.zps", "start": 1038659, "end": 1041402}, {"filename": "/fx/iceb_crach.zps", "start": 1041402, "end": 1043731}, {"filename": "/fx/iceb_idle.zps", "start": 1043731, "end": 1044731}, {"filename": "/fx/iceb_sl.zps", "start": 1044731, "end": 1046812}, {"filename": "/fx/loading_end.zps", "start": 1046812, "end": 1048369}, {"filename": "/fx/loading_idle.zps", "start": 1048369, "end": 1056594}, {"filename": "/fx/pack06_bg_fire_01.zps", "start": 1056594, "end": 1060325}, {"filename": "/fx/part_thank.zps", "start": 1060325, "end": 1063931}, {"filename": "/fx/restartb_fx_tutorial.zps", "start": 1063931, "end": 1066189}, {"filename": "/fx/shop_energy.zps", "start": 1066189, "end": 1067199}, {"filename": "/fx/shop_hint.zps", "start": 1067199, "end": 1068768}, {"filename": "/fx/shop_stardust.zps", "start": 1068768, "end": 1070337}, {"filename": "/fx/star_1_2.zps", "start": 1070337, "end": 1072630}, {"filename": "/fx/star_3.zps", "start": 1072630, "end": 1079712}, {"filename": "/fx/star__collecting.zps", "start": 1079712, "end": 1084078}, {"filename": "/fx/star_collection_result.zps", "start": 1084078, "end": 1086445}, {"filename": "/fx/star_part__idle.zps", "start": 1086445, "end": 1087463}, {"filename": "/fx/star_result .zps", "start": 1087463, "end": 1087947}, {"filename": "/fx/teleporl_idle.zps", "start": 1087947, "end": 1089584}, {"filename": "/fx/teleport_output.zps", "start": 1089584, "end": 1092304}, {"filename": "/fx/thank_1.zps", "start": 1092304, "end": 1094069}, {"filename": "/fx/thank_2.zps", "start": 1094069, "end": 1096338}, {"filename": "/fx/transformation.zps", "start": 1096338, "end": 1103330}, {"filename": "/fx/transformation_bulb.zps", "start": 1103330, "end": 1110279}, {"filename": "/fx/transformation_candy.zps", "start": 1110279, "end": 1116415}, {"filename": "/fx/transformation_short.zps", "start": 1116415, "end": 1123407}, {"filename": "/fx/trigger_constant.zps", "start": 1123407, "end": 1126125}, {"filename": "/fx/trigger_idle.zps", "start": 1126125, "end": 1127195}, {"filename": "/fx/trigger_pulsar.zps", "start": 1127195, "end": 1128720}, {"filename": "/fx/tutorial_hint.zps", "start": 1128720, "end": 1130230}, {"filename": "/fx/water_part.zps", "start": 1130230, "end": 1135734}, {"filename": "/fx_640_960.raw", "start": 1135734, "end": 1179596}, {"filename": "/gpx.resources", "start": 1179596, "end": 1189841}, {"filename": "/gradients_640_960.raw", "start": 1189841, "end": 1192137}, {"filename": "/hint_appearance.pb", "start": 1192137, "end": 1208594}, {"filename": "/hint_appearance_640_960.png", "start": 1208594, "end": 1217244}, {"filename": "/hint_firefly.pb", "start": 1217244, "end": 1360339}, {"filename": "/hint_firefly_640_960.raw", "start": 1360339, "end": 1366632}, {"filename": "/hud_640_960.png", "start": 1366632, "end": 1373865}, {"filename": "/hud_abilities.pb", "start": 1373865, "end": 1420238}, {"filename": "/hud_btn_hint.pb", "start": 1420238, "end": 1462089}, {"filename": "/hud_btn_pause.pb", "start": 1462089, "end": 1468808}, {"filename": "/hud_btn_restart.pb", "start": 1468808, "end": 1475653}, {"filename": "/hud_common.pb", "start": 1475653, "end": 1483872}, {"filename": "/hud_common_640_960.raw", "start": 1483872, "end": 1487752}, {"filename": "/hud_star.pb", "start": 1487752, "end": 1491349}, {"filename": "/icon_640_960.png", "start": 1491349, "end": 1496166}, {"filename": "/language_640_960.raw", "start": 1496166, "end": 1502491}, {"filename": "/loaderbar_empty_640_960.png", "start": 1502491, "end": 1504066}, {"filename": "/loaderbar_full_640_960.png", "start": 1504066, "end": 1507504}, {"filename": "/loading.pb", "start": 1507504, "end": 1538247}, {"filename": "/loading_640_960.raw", "start": 1538247, "end": 1547892}, {"filename": "/loading_bgr_640_960.raw", "start": 1547892, "end": 1553153}, {"filename": "/map_01.pb", "start": 1553153, "end": 1605871}, {"filename": "/map_02.pb", "start": 1605871, "end": 1639199}, {"filename": "/map_03.pb", "start": 1639199, "end": 1675626}, {"filename": "/map_04.pb", "start": 1675626, "end": 1721747}, {"filename": "/map_05.pb", "start": 1721747, "end": 1765540}, {"filename": "/map_06.pb", "start": 1765540, "end": 1799781}, {"filename": "/map_640_960.raw", "start": 1799781, "end": 1867267}, {"filename": "/map_bowl.pb", "start": 1867267, "end": 1966759}, {"filename": "/map_bowl_beeline.pb", "start": 1966759, "end": 2066686}, {"filename": "/map_bowl_panda.pb", "start": 2066686, "end": 2166351}, {"filename": "/map_bowl_touch.pb", "start": 2166351, "end": 2268074}, {"filename": "/map_bowl_zain.pb", "start": 2268074, "end": 2369796}, {"filename": "/map_bowl_zain_iraq.pb", "start": 2369796, "end": 2472623}, {"filename": "/map_cartoons.pb", "start": 2472623, "end": 2483062}, {"filename": "/map_corner.pb", "start": 2483062, "end": 2512287}, {"filename": "/map_decor_01_640_960.raw", "start": 2512287, "end": 2524244}, {"filename": "/map_decor_02_640_960.raw", "start": 2524244, "end": 2533339}, {"filename": "/map_decor_03_640_960.raw", "start": 2533339, "end": 2570001}, {"filename": "/map_decor_04_640_960.raw", "start": 2570001, "end": 2579419}, {"filename": "/map_decor_05_640_960.raw", "start": 2579419, "end": 2592080}, {"filename": "/map_decor_06_640_960.raw", "start": 2592080, "end": 2602472}, {"filename": "/map_fx.pb", "start": 2602472, "end": 2604307}, {"filename": "/map_level.pb", "start": 2604307, "end": 2724208}, {"filename": "/map_level_boss_fx.pb", "start": 2724208, "end": 2763394}, {"filename": "/map_level_highlight.pb", "start": 2763394, "end": 2764177}, {"filename": "/map_moregames.pb", "start": 2764177, "end": 2769348}, {"filename": "/map_omnom.pb", "start": 2769348, "end": 2888177}, {"filename": "/map_promo.pb", "start": 2888177, "end": 2906080}, {"filename": "/map_side_640_960.webp", "start": 2906080, "end": 2930581}, {"filename": "/map_side_beeline_640_960.webp", "start": 2930581, "end": 2940777}, {"filename": "/map_side_panda_640_960.webp", "start": 2940777, "end": 2957013}, {"filename": "/map_side_touch_640_960.webp", "start": 2957013, "end": 2962229}, {"filename": "/map_side_zain_640_960.webp", "start": 2962229, "end": 2969503}, {"filename": "/map_side_zain_iraq_640_960.webp", "start": 2969503, "end": 2978150}, {"filename": "/map_tab.pb", "start": 2978150, "end": 3004580}, {"filename": "/maps/!_MapSelectController.xml", "start": 3004580, "end": 3024414}, {"filename": "/maps/!_MasterGameDesignDocument.xml", "start": 3024414, "end": 3045187}, {"filename": "/maps/Tuts/CircleSquare.xml", "start": 3045187, "end": 3047560}, {"filename": "/maps/Tuts/Flow_01.xml", "start": 3047560, "end": 3049538}, {"filename": "/maps/Tuts/Ghost_03c.xml", "start": 3049538, "end": 3052127}, {"filename": "/maps/Tuts/WalkingCandy2.xml", "start": 3052127, "end": 3053742}, {"filename": "/maps/Tuts/tri_rotate.xml", "start": 3053742, "end": 3056057}, {"filename": "/maps/allmaps.xml", "start": 3056057, "end": 3056688}, {"filename": "/maps/bosses/2p08newold.xml", "start": 3056688, "end": 3059575}, {"filename": "/maps/bosses/2p10ss.xml", "start": 3059575, "end": 3064038}, {"filename": "/maps/bosses/2p18a.xml", "start": 3064038, "end": 3069048}, {"filename": "/maps/bosses/2p19aa.xml", "start": 3069048, "end": 3072144}, {"filename": "/maps/bosses/4p01abc.xml", "start": 3072144, "end": 3078686}, {"filename": "/maps/bosses/4p08az.xml", "start": 3078686, "end": 3082291}, {"filename": "/maps/bosses/6p04tt.xml", "start": 3082291, "end": 3085884}, {"filename": "/maps/bosses/6p05q.xml", "start": 3085884, "end": 3089510}, {"filename": "/maps/bosses/timed3_02f.xml", "start": 3089510, "end": 3091836}, {"filename": "/maps/bosses/timed3_05d.xml", "start": 3091836, "end": 3094228}, {"filename": "/maps/bosses/timed_12b.xml", "start": 3094228, "end": 3096981}, {"filename": "/maps/pack1a/a_015b.xml", "start": 3096981, "end": 3099364}, {"filename": "/maps/pack1a/a_017easy.xml", "start": 3099364, "end": 3101730}, {"filename": "/maps/pack1a/a_25b.xml", "start": 3101730, "end": 3103594}, {"filename": "/maps/pack1a/a_28b.xml", "start": 3103594, "end": 3106278}, {"filename": "/maps/pack1a/a_29.xml", "start": 3106278, "end": 3108179}, {"filename": "/maps/pack1a/a_30.xml", "start": 3108179, "end": 3109856}, {"filename": "/maps/pack1a/a_31.xml", "start": 3109856, "end": 3113671}, {"filename": "/maps/pack1a/a_34.xml", "start": 3113671, "end": 3117494}, {"filename": "/maps/pack1a/a_36.xml", "start": 3117494, "end": 3119272}, {"filename": "/maps/pack1a/a_43d.xml", "start": 3119272, "end": 3121378}, {"filename": "/maps/pack1a/a_44c.xml", "start": 3121378, "end": 3123225}, {"filename": "/maps/pack1a/a_46b.xml", "start": 3123225, "end": 3125271}, {"filename": "/maps/pack1a/a_48easy.xml", "start": 3125271, "end": 3127832}, {"filename": "/maps/pack2/16abcd.xml", "start": 3127832, "end": 3129785}, {"filename": "/maps/pack2/K100.xml", "start": 3129785, "end": 3132758}, {"filename": "/maps/pack2/K102.xml", "start": 3132758, "end": 3134579}, {"filename": "/maps/pack2/K103.xml", "start": 3134579, "end": 3137025}, {"filename": "/maps/pack2/K12neww.xml", "start": 3137025, "end": 3141012}, {"filename": "/maps/pack2/K14.xml", "start": 3141012, "end": 3144052}, {"filename": "/maps/pack2/K17d.xml", "start": 3144052, "end": 3146855}, {"filename": "/maps/pack2/K21aa.xml", "start": 3146855, "end": 3149883}, {"filename": "/maps/pack2/K23.xml", "start": 3149883, "end": 3153294}, {"filename": "/maps/pack2/K30ff.xml", "start": 3153294, "end": 3155166}, {"filename": "/maps/pack2/K32s.xml", "start": 3155166, "end": 3158703}, {"filename": "/maps/pack2/K37z.xml", "start": 3158703, "end": 3161426}, {"filename": "/maps/pack2/K3y.xml", "start": 3161426, "end": 3163936}, {"filename": "/maps/pack2/K4aa.xml", "start": 3163936, "end": 3166332}, {"filename": "/maps/pack2/K8aa.xml", "start": 3166332, "end": 3169844}, {"filename": "/maps/pack3a/a3_09b.xml", "start": 3169844, "end": 3172408}, {"filename": "/maps/pack3a/a3_13c.xml", "start": 3172408, "end": 3174622}, {"filename": "/maps/pack3a/a3_17.xml", "start": 3174622, "end": 3176094}, {"filename": "/maps/pack3a/a3_19.xml", "start": 3176094, "end": 3178216}, {"filename": "/maps/pack3a/a3_21b.xml", "start": 3178216, "end": 3180976}, {"filename": "/maps/pack3a/a3_23.xml", "start": 3180976, "end": 3183811}, {"filename": "/maps/pack3a/a3_24b.xml", "start": 3183811, "end": 3187021}, {"filename": "/maps/pack3a/a3_27b.xml", "start": 3187021, "end": 3190615}, {"filename": "/maps/pack3a/a3_27n.xml", "start": 3190615, "end": 3193636}, {"filename": "/maps/pack3a/a3_28c.xml", "start": 3193636, "end": 3197142}, {"filename": "/maps/pack3a/a3_31c.xml", "start": 3197142, "end": 3200267}, {"filename": "/maps/pack3a/a3_33.xml", "start": 3200267, "end": 3202255}, {"filename": "/maps/pack3a/a3_34d.xml", "start": 3202255, "end": 3204563}, {"filename": "/maps/pack3a/a3_36.xml", "start": 3204563, "end": 3207313}, {"filename": "/maps/pack3a/a3_37.xml", "start": 3207313, "end": 3209569}, {"filename": "/maps/pack3a/a3_38c.xml", "start": 3209569, "end": 3211095}, {"filename": "/maps/pack3a/a3_41c.xml", "start": 3211095, "end": 3213184}, {"filename": "/maps/pack3a/a3_43.xml", "start": 3213184, "end": 3215145}, {"filename": "/maps/pack3a/a3_44.xml", "start": 3215145, "end": 3217090}, {"filename": "/maps/pack3a/a3_45b.xml", "start": 3217090, "end": 3219956}, {"filename": "/maps/pack4/M11a.xml", "start": 3219956, "end": 3223579}, {"filename": "/maps/pack4/M19.xml", "start": 3223579, "end": 3228125}, {"filename": "/maps/pack4/M2aa.xml", "start": 3228125, "end": 3231355}, {"filename": "/maps/pack4/M32w.xml", "start": 3231355, "end": 3235260}, {"filename": "/maps/pack4/M38.xml", "start": 3235260, "end": 3238110}, {"filename": "/maps/pack4/M46rr.xml", "start": 3238110, "end": 3242249}, {"filename": "/maps/pack4/M49.xml", "start": 3242249, "end": 3245922}, {"filename": "/maps/pack4/M50aa.xml", "start": 3245922, "end": 3249367}, {"filename": "/maps/pack4/M51aa.xml", "start": 3249367, "end": 3252717}, {"filename": "/maps/pack4/M53mir.xml", "start": 3252717, "end": 3254480}, {"filename": "/maps/pack4/M7.xml", "start": 3254480, "end": 3257836}, {"filename": "/maps/pack4/M9i.xml", "start": 3257836, "end": 3261026}, {"filename": "/maps/pack4a/a4_02c.xml", "start": 3261026, "end": 3262785}, {"filename": "/maps/pack4a/a4_03d.xml", "start": 3262785, "end": 3265214}, {"filename": "/maps/pack4a/a4_04d.xml", "start": 3265214, "end": 3268047}, {"filename": "/maps/pack4a/a4_05e.xml", "start": 3268047, "end": 3270558}, {"filename": "/maps/pack4a/a4_06k.xml", "start": 3270558, "end": 3272959}, {"filename": "/maps/pack4a/a4_07.xml", "start": 3272959, "end": 3276149}, {"filename": "/maps/pack4a/a4_08b.xml", "start": 3276149, "end": 3278200}, {"filename": "/maps/pack5/L02.xml", "start": 3278200, "end": 3281428}, {"filename": "/maps/pack5/L04.xml", "start": 3281428, "end": 3285547}, {"filename": "/maps/pack5/L05.xml", "start": 3285547, "end": 3287952}, {"filename": "/maps/pack5/L06.xml", "start": 3287952, "end": 3291842}, {"filename": "/maps/pack5/L08aa.xml", "start": 3291842, "end": 3294870}, {"filename": "/maps/pack5/L17aaa.xml", "start": 3294870, "end": 3298074}, {"filename": "/maps/pack5/L18.xml", "start": 3298074, "end": 3300904}, {"filename": "/maps/pack5/L20s.xml", "start": 3300904, "end": 3304533}, {"filename": "/maps/pack5a/a5_01b.xml", "start": 3304533, "end": 3307725}, {"filename": "/maps/pack5a/a5_02.xml", "start": 3307725, "end": 3309991}, {"filename": "/maps/pack5a/a5_05c.xml", "start": 3309991, "end": 3313512}, {"filename": "/maps/pack5a/a5_06.xml", "start": 3313512, "end": 3316171}, {"filename": "/maps/pack5a/a5_09c.xml", "start": 3316171, "end": 3319024}, {"filename": "/maps/pack5a/a5_12e.xml", "start": 3319024, "end": 3321925}, {"filename": "/maps/pack5a/a5_13.xml", "start": 3321925, "end": 3323727}, {"filename": "/maps/pack5a/a5_14.xml", "start": 3323727, "end": 3326396}, {"filename": "/maps/pack5a/a5_15b.xml", "start": 3326396, "end": 3329138}, {"filename": "/maps/pack5a/a5_17d.xml", "start": 3329138, "end": 3331788}, {"filename": "/maps/pack6/P03.xml", "start": 3331788, "end": 3335373}, {"filename": "/maps/pack6/P05.xml", "start": 3335373, "end": 3339355}, {"filename": "/maps/pack6/P06.xml", "start": 3339355, "end": 3342946}, {"filename": "/maps/pack6/P07.xml", "start": 3342946, "end": 3345701}, {"filename": "/maps/pack6/P10.xml", "start": 3345701, "end": 3348741}, {"filename": "/maps/pack6/P11a.xml", "start": 3348741, "end": 3352286}, {"filename": "/maps/pack6/P13.xml", "start": 3352286, "end": 3354381}, {"filename": "/maps/pack6/P14.xml", "start": 3354381, "end": 3356254}, {"filename": "/maps/pack6/P15.xml", "start": 3356254, "end": 3359923}, {"filename": "/maps/pack6/P17b.xml", "start": 3359923, "end": 3362257}, {"filename": "/maps/pack6/P18.xml", "start": 3362257, "end": 3366340}, {"filename": "/maps/pack6/P24a.xml", "start": 3366340, "end": 3369396}, {"filename": "/maps/pack6/P26a.xml", "start": 3369396, "end": 3372698}, {"filename": "/maps/pack6a/a6_01.xml", "start": 3372698, "end": 3374616}, {"filename": "/maps/pack6a/a6_02dd.xml", "start": 3374616, "end": 3376759}, {"filename": "/maps/pack6a/a6_03b.xml", "start": 3376759, "end": 3378978}, {"filename": "/maps/pack6a/a6_05b.xml", "start": 3378978, "end": 3381941}, {"filename": "/maps/pack6a/a6_07c.xml", "start": 3381941, "end": 3387470}, {"filename": "/maps/pack6a/a6_11.xml", "start": 3387470, "end": 3389853}, {"filename": "/maps/sortedlist.xml", "start": 3389853, "end": 3393976}, {"filename": "/menu_native_ad_640_960.raw", "start": 3393976, "end": 3400478}, {"filename": "/menu_popup_achiev_640_960.raw", "start": 3400478, "end": 3401633}, {"filename": "/menu_popup_achiev_icons_640_960.raw", "start": 3401633, "end": 3402141}, {"filename": "/menu_promo_banner_640_960.jpeg", "start": 3402141, "end": 3402785}, {"filename": "/mission_pause.pb", "start": 3402785, "end": 3404776}, {"filename": "/mission_pause_640_960.raw", "start": 3404776, "end": 3406100}, {"filename": "/numbers_640_960.png", "start": 3406100, "end": 3407117}, {"filename": "/numbers_f2p.pb", "start": 3407117, "end": 3408922}, {"filename": "/obj_candy.pb", "start": 3408922, "end": 3412854}, {"filename": "/obj_hook_640_960.raw", "start": 3412854, "end": 3416483}, {"filename": "/obj_pump.pb", "start": 3416483, "end": 3422350}, {"filename": "/obj_rope.pb", "start": 3422350, "end": 3423080}, {"filename": "/obj_rope_640_960.raw", "start": 3423080, "end": 3423493}, {"filename": "/obj_star_640_960.raw", "start": 3423493, "end": 3426454}, {"filename": "/off_advertising_640_960.raw", "start": 3426454, "end": 3432985}, {"filename": "/omnom.pb", "start": 3432985, "end": 4250462}, {"filename": "/omnom_640_960.raw", "start": 4250462, "end": 4391012}, {"filename": "/omnom_bird.pb", "start": 4391012, "end": 4859122}, {"filename": "/omnom_dragon.pb", "start": 4859122, "end": 4932216}, {"filename": "/omnom_fish.pb", "start": 4932216, "end": 5039145}, {"filename": "/omnom_ghost.pb", "start": 5039145, "end": 5123764}, {"filename": "/omnom_glow.pb", "start": 5123764, "end": 5125486}, {"filename": "/omnom_mouse.pb", "start": 5125486, "end": 5484613}, {"filename": "/omnom_particles.pb", "start": 5484613, "end": 5485227}, {"filename": "/omnom_particles_640_960.raw", "start": 5485227, "end": 5485606}, {"filename": "/omnom_result.pb", "start": 5485606, "end": 5681138}, {"filename": "/omnom_small.pb", "start": 5681138, "end": 5892916}, {"filename": "/omnom_ui_640_960.raw", "start": 5892916, "end": 5904918}, {"filename": "/panda_banner.pb", "start": 5904918, "end": 5911730}, {"filename": "/panda_banner_640_960.webp", "start": 5911730, "end": 5922130}, {"filename": "/pop_up_new_640_960.raw", "start": 5922130, "end": 5932000}, {"filename": "/popup.pb", "start": 5932000, "end": 5933919}, {"filename": "/popup_640_960.raw", "start": 5933919, "end": 5946711}, {"filename": "/popup_ctr3_640_960.raw", "start": 5946711, "end": 5947658}, {"filename": "/popup_facebook_picture_640_960.raw", "start": 5947658, "end": 5950489}, {"filename": "/popup_more_apps_640_960.raw", "start": 5950489, "end": 5951931}, {"filename": "/processing.pb", "start": 5951931, "end": 5959221}, {"filename": "/processing_assets_640_960.raw", "start": 5959221, "end": 5962117}, {"filename": "/progress_640_960.raw", "start": 5962117, "end": 5962185}, {"filename": "/promo.pb", "start": 5962185, "end": 5966460}, {"filename": "/promo_640_960.raw", "start": 5966460, "end": 5971077}, {"filename": "/promobanner_640_960.jpeg", "start": 5971077, "end": 5971703}, {"filename": "/reset_640_960.raw", "start": 5971703, "end": 5971771}, {"filename": "/result_2.pb", "start": 5971771, "end": 6054728}, {"filename": "/result_2_640_960.raw", "start": 6054728, "end": 6131621}, {"filename": "/result_bgr.pb", "start": 6131621, "end": 6203141}, {"filename": "/segoeprb.ttf", "start": 6203141, "end": 6375233}, {"filename": "/settings_640_960.raw", "start": 6375233, "end": 6375301}, {"filename": "/shop.pb", "start": 6375301, "end": 6489894}, {"filename": "/shop_640_960.raw", "start": 6489894, "end": 6521169}, {"filename": "/shop_bonus_beeline_640_960.webp", "start": 6521169, "end": 6528213}, {"filename": "/shop_bonus_panda_640_960.webp", "start": 6528213, "end": 6535763}, {"filename": "/shop_bonus_touch_640_960.webp", "start": 6535763, "end": 6541361}, {"filename": "/shop_bonus_zain_640_960.webp", "start": 6541361, "end": 6547386}, {"filename": "/shop_bonus_zain_iraq_640_960.webp", "start": 6547386, "end": 6553031}, {"filename": "/sponsorship_640_960.raw", "start": 6553031, "end": 6561878}, {"filename": "/sponsorship_map_obj_1.pb", "start": 6561878, "end": 6573609}, {"filename": "/sponsorship_map_obj_1_640_960.webp", "start": 6573609, "end": 6577664}, {"filename": "/sponsorship_map_obj_2_640_960.webp", "start": 6577664, "end": 6582668}, {"filename": "/sponsorship_map_obj_3.pb", "start": 6582668, "end": 6594399}, {"filename": "/sponsorship_map_obj_3_640_960.webp", "start": 6594399, "end": 6598451}, {"filename": "/sponsorship_map_obj_4.pb", "start": 6598451, "end": 6610182}, {"filename": "/sponsorship_map_obj_4_640_960.webp", "start": 6610182, "end": 6614069}, {"filename": "/sponsorship_map_obj_5.pb", "start": 6614069, "end": 6625830}, {"filename": "/sponsorship_map_obj_5_640_960.webp", "start": 6625830, "end": 6629885}, {"filename": "/star.pb", "start": 6629885, "end": 6658558}, {"filename": "/star_640_960.raw", "start": 6658558, "end": 6666236}, {"filename": "/strings.xml", "start": 6666236, "end": 7299759}, {"filename": "/teleport.pb", "start": 7299759, "end": 7313221}, {"filename": "/teleport_640_960.raw", "start": 7313221, "end": 7318462}, {"filename": "/texture_01_640_960.raw", "start": 7318462, "end": 7325271}, {"filename": "/texture_02_640_960.raw", "start": 7325271, "end": 7329725}, {"filename": "/texture_dive_640_960.raw", "start": 7329725, "end": 7336321}, {"filename": "/texture_ghost_640_960.raw", "start": 7336321, "end": 7345410}, {"filename": "/texture_ice_640_960.raw", "start": 7345410, "end": 7348434}, {"filename": "/texture_power_640_960.raw", "start": 7348434, "end": 7354523}, {"filename": "/texture_walk_640_960.raw", "start": 7354523, "end": 7360217}, {"filename": "/thanks.pb", "start": 7360217, "end": 7396590}, {"filename": "/thanks_640_960.raw", "start": 7396590, "end": 7399210}, {"filename": "/trajectory_point_640_960.raw", "start": 7399210, "end": 7399633}, {"filename": "/transition.pb", "start": 7399633, "end": 7406620}, {"filename": "/transition_640_960.raw", "start": 7406620, "end": 7415149}, {"filename": "/triger.pb", "start": 7415149, "end": 7424009}, {"filename": "/triger_640_960.raw", "start": 7424009, "end": 7426201}, {"filename": "/tutor.pb", "start": 7426201, "end": 7460445}, {"filename": "/tutor_640_960.raw", "start": 7460445, "end": 7462432}, {"filename": "/water_640_960.raw", "start": 7462432, "end": 7466436}, {"filename": "/wood_plank_640_960.raw", "start": 7466436, "end": 7474546}, {"filename": "/zepto_logo_640_960.raw", "start": 7474546, "end": 7489588}, {"filename": "/zepto_splash.pb", "start": 7489588, "end": 7512049}], "remote_package_size": 7512049});
+
+  })();

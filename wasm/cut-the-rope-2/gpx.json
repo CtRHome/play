@@ -1,0 +1,43 @@
+{
+    "name": "ctr2",
+    "version": "5",
+    "symbols": "1",
+    "origin": "c++",
+    "engineVersion": "",
+    "webglAttributes": {
+        "maxWebGLVersion": 1
+    },
+    "runtime": {
+        "aspect": [0.66, 0.8],
+        "orientation": "portrait",
+        "res": [
+            {
+                "glob": "emctr2/emscripten/**",
+                "root": "emctr2/emscripten/"
+            }
+        ]
+    },
+    "tinyLoaderScript": "scripts/tiny-loader.js",
+    "sdkScripts": ["scripts/sdk.js", "scripts/gamepix-adapter.js"],
+    "workerScripts": {
+        "browserImageLoader": "scripts/browser-image-loader.js",
+        "wasmImageLoader": {
+            "wasm": "scripts/wasm-image-loader.wasm",
+            "wasmJs": "scripts/wasm-image-loader.js"
+        }
+    },
+    "sizes": {
+        "br/bin.data._.wasm.br": 2370472,
+        "br/bin.data.js.br": 7605,
+        "br/wbin.js.br": 48266,
+        "br/wbin._.wasm.br": 529935,
+        "gz/bin.data._.js.gz": 2693059,
+        "gz/bin.data.js.gz": 9307,
+        "gz/wbin._.js.gz": 686041,
+        "gz/wbin.js.gz": 56812,
+        "bin.data._.js": 8512056,
+        "bin.data.js": 52885,
+        "wbin._.js": 1893927,
+        "wbin.js": 222175
+    }
+}

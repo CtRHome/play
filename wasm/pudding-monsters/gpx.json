@@ -1,0 +1,45 @@
+{
+  "name": "puddingmonsters",
+  "version": "6",
+  "symbols": "1",
+  "origin": "c++",
+  "engineVersion": "",
+  "webglAttributes": {
+    "maxWebGLVersion": 1
+  },
+  "runtime": {
+    "aspect": [
+      0.7,
+      0.7
+    ],
+    "orientation": "portrait",
+    "res": [
+      {
+        "glob": "emscripten/**",
+        "root": "emscripten/"
+      }
+    ]
+  },
+  "tinyLoaderScript": "tiny-loader.js",
+  "sdkScripts": [
+    "sdk.js",
+    "gamepix-adapter.js"
+  ],
+  "sizes": {
+    "br/bin.data.js.br": 4125,
+    "br/bin.mem.js.br": 50763,
+    "br/wbin.js.br": 44986,
+    "br/wbin._.js.br": 277111,
+    "br/bin.data._.js.br": 1538552,
+    "gz/bin.data.js.gz": 5257,
+    "gz/bin.data._.js.gz": 1605846,
+    "gz/bin.mem.js.gz": 67176,
+    "gz/wbin._.js.gz": 349460,
+    "gz/wbin.js.gz": 52717,
+    "bin.data._.js": 2882590,
+    "bin.data.js": 27169,
+    "bin.mem.js": 476003,
+    "wbin._.js": 1164564,
+    "wbin.js": 206661
+  }
+}
